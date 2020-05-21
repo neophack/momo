@@ -20,6 +20,7 @@ struct ConnectionSettings {
   bool no_video_device = false;
   bool no_audio_device = false;
   bool force_i420 = false;
+  bool force_uyvy = false;
   bool use_native = false;
   std::string video_device = "";
   std::string resolution = "VGA";
