@@ -198,7 +198,7 @@ int32_t V4L2VideoCapture::StartCapture(ConnectionSettings cs) {
   // I420 otherwise.
   const int nFormats = 5;
   unsigned int fmts[nFormats];
-  if (!cs.force_i420 && (size.width > 640 || size.height > 480)) {
+  if (!cs.force_i420 && !cs.force_uyvy && (size.width > 640 || size.height > 480)) {
     fmts[0] = V4L2_PIX_FMT_MJPEG;
     fmts[1] = V4L2_PIX_FMT_YUV420;
     fmts[2] = V4L2_PIX_FMT_YUYV;
@@ -220,6 +220,9 @@ int32_t V4L2VideoCapture::StartCapture(ConnectionSettings cs) {
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   RTC_LOG(LS_INFO) << "Video Capture enumerats supported image formats:";
   while (ioctl(_deviceFd, VIDIOC_ENUM_FMT, &fmt) == 0) {
+    if(cs.force_uyvy){
+      fmt.pixelformat=V4L2_PIX_FMT_UYVY;
+    }
     RTC_LOG(LS_INFO) << "  { pixelformat = "
                      << cricket::GetFourccName(fmt.pixelformat)
                      << ", description = '" << fmt.description << "' }";

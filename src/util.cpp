@@ -204,6 +204,10 @@ void Util::parseArgs(int argc,
          "--force-i420", cs.force_i420,
          "Prefer I420 format for video capture (only on supported devices)")
       ->check(is_valid_force_i420);
+  app.add_flag(
+         "--force-uyvy", cs.force_uyvy,
+         "Prefer UYVY format for video capture (only on supported devices)")
+      ->check(is_valid_force_i420);
   app.add_flag("--use-native", cs.use_native,
                "Perform MJPEG deoode and video resize by hardware acceleration "
                "(only on supported devices)")
