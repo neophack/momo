@@ -47,6 +47,7 @@ void Util::parseArgs(int argc,
   local_nh.param<bool>("no_audio_device", cs.no_audio_device,
                        cs.no_audio_device);
   local_nh.param<bool>("force_i420", cs.force_i420, cs.force_i420);
+  local_nh.param<bool>("force_uyvy", cs.force_uyvy, cs.force_uyvy);
   local_nh.param<bool>("use_native", cs.use_native, cs.use_native);
 #if USE_MMAL_ENCODER || USE_JETSON_ENCODER
   local_nh.param<std::string>("video_device", cs.video_device, cs.video_device);
