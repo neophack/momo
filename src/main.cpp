@@ -9,20 +9,20 @@
 #include "rtc_base/log_sinks.h"
 
 #if USE_ROS
-  #include "ros/ros_log_sink.h"
-  #include "ros/ros_video_capture.h"
-  #include "signal_listener.h"
+#include "ros/ros_log_sink.h"
+#include "ros/ros_video_capture.h"
+#include "signal_listener.h"
 #else
-  #if defined(__APPLE__)
-    #include "mac_helper/mac_capturer.h"
-  #elif defined(__linux__)
-    #if USE_MMAL_ENCODER
-      #include "hwenc_mmal/mmal_v4l2_capture.h"
-    #endif
-    #include "v4l2_video_capturer/v4l2_video_capturer.h"
-  #else
-    #include "rtc/device_video_capturer.h"
-  #endif
+#if defined(__APPLE__)
+#include "mac_helper/mac_capturer.h"
+#elif defined(__linux__)
+#if USE_MMAL_ENCODER
+#include "hwenc_mmal/mmal_v4l2_capture.h"
+#endif
+#include "v4l2_video_capturer/v4l2_video_capturer.h"
+#else
+#include "rtc/device_video_capturer.h"
+#endif
 #endif
 
 #include "serial_data_channel/serial_data_manager.h"
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 #endif
 #else
     return DeviceVideoCapturer::Create(size.width, size.height, cs.framerate,
-                                       cs.video_device,cs.force_uyvy);
+                                       cs.video_device, cs.force_uyvy);
 #endif
 #endif  // USE_ROS
   })();

@@ -28,7 +28,7 @@ bool DeviceVideoCapturer::Init(size_t width,
                                size_t height,
                                size_t target_fps,
                                size_t capture_device_index,
-    bool force_uyvy) {
+                               bool force_uyvy) {
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info(
       webrtc::VideoCaptureFactory::CreateDeviceInfo());
 
@@ -53,10 +53,10 @@ bool DeviceVideoCapturer::Init(size_t width,
   capability_.height = static_cast<int32_t>(height);
   capability_.maxFPS = static_cast<int32_t>(target_fps);
   capability_.videoType = webrtc::VideoType::kI420;
-  if(force_uyvy){
+  if (force_uyvy) {
     capability_.videoType = webrtc::VideoType::kUYVY;
   }
-  
+
   if (vcm_->StartCapture(capability_) != 0) {
     Destroy();
     return false;
@@ -67,8 +67,11 @@ bool DeviceVideoCapturer::Init(size_t width,
   return true;
 }
 
-rtc::scoped_refptr<DeviceVideoCapturer>
-DeviceVideoCapturer::Create(size_t width, size_t height, size_t target_fps) {
+rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
+    size_t width,
+    size_t height,
+    size_t target_fps,
+    bool force_uyvy) {
   rtc::scoped_refptr<DeviceVideoCapturer> capturer;
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(
       webrtc::VideoCaptureFactory::CreateDeviceInfo());
@@ -78,7 +81,7 @@ DeviceVideoCapturer::Create(size_t width, size_t height, size_t target_fps) {
   }
   int num_devices = info->NumberOfDevices();
   for (int i = 0; i < num_devices; ++i) {
-    capturer = Create(width, height, target_fps, i,false);
+    capturer = Create(width, height, target_fps, i, force_uyvy);
     if (capturer) {
       RTC_LOG(LS_WARNING) << "Get Capture";
       return capturer;
@@ -97,7 +100,8 @@ rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
     bool force_uyvy) {
   rtc::scoped_refptr<DeviceVideoCapturer> vcm_capturer(
       new rtc::RefCountedObject<DeviceVideoCapturer>());
-  if (!vcm_capturer->Init(width, height, target_fps, capture_device_index,force_uyvy)) {
+  if (!vcm_capturer->Init(width, height, target_fps, capture_device_index,
+                          force_uyvy)) {
     RTC_LOG(LS_WARNING) << "Failed to create DeviceVideoCapturer(w = " << width
                         << ", h = " << height << ", fps = " << target_fps
                         << ")";
@@ -122,14 +126,15 @@ rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
 
   // デバイス指定なし
   if (capture_device.empty()) {
-    return Create(width, height, target_fps);
+    return Create(width, height, target_fps, force_uyvy);
   }
 
   auto index = vcm_capturer->GetDeviceIndex(capture_device);
   if (index < 0) {
     return nullptr;
   }
-  return Create(width, height, target_fps, static_cast<size_t>(index),force_uyvy);
+  return Create(width, height, target_fps, static_cast<size_t>(index),
+                force_uyvy);
 }
 
 void DeviceVideoCapturer::Destroy() {
@@ -162,8 +167,7 @@ int DeviceVideoCapturer::LogDeviceInfo() {
       RTC_LOG(LS_WARNING) << "Failed to GetDeviceName(" << i << ")";
       continue;
     }
-    RTC_LOG(LS_INFO) << "GetDeviceName(" << i
-                     << "): device_name=" << name
+    RTC_LOG(LS_INFO) << "GetDeviceName(" << i << "): device_name=" << name
                      << ", unique_name=" << id;
   }
   return 0;
@@ -184,8 +188,7 @@ int DeviceVideoCapturer::GetDeviceIndex(const std::string& device) {
                   [](char ch) { return std::isdigit(ch); })) {
     try {
       ndev = std::stoi(device);
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception&) {
       ndev = -1;
     }
   }
@@ -196,8 +199,8 @@ int DeviceVideoCapturer::GetDeviceIndex(const std::string& device) {
     const uint32_t kSize = 256;
     char name[kSize] = {0};
     char mid[kSize] = {0};
-    if (info->GetDeviceName(static_cast<uint32_t>(i),
-                            name, kSize, mid, kSize) != -1) {
+    if (info->GetDeviceName(static_cast<uint32_t>(i), name, kSize, mid,
+                            kSize) != -1) {
       // デバイスidでの検索
       if (i == ndev) {
         return i;
