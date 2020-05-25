@@ -57,8 +57,6 @@ bool DeviceVideoCapturer::Init(size_t width,
     capability_.videoType = webrtc::VideoType::kUYVY;
   }
   
-
-
   if (vcm_->StartCapture(capability_) != 0) {
     Destroy();
     return false;
