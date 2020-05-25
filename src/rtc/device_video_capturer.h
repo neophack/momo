@@ -28,12 +28,14 @@ class DeviceVideoCapturer : public ScalableVideoTrackSource,
       size_t width,
       size_t height,
       size_t target_fps,
-      size_t capture_device_index);
+      size_t capture_device_index,
+      bool force_uyvy= false);
   static rtc::scoped_refptr<DeviceVideoCapturer> Create(
       size_t width,
       size_t height,
       size_t target_fps,
-      const std::string& capture_device);
+      const std::string& capture_device,
+      bool force_uyvy = false);
   DeviceVideoCapturer();
   virtual ~DeviceVideoCapturer();
 
@@ -41,7 +43,8 @@ class DeviceVideoCapturer : public ScalableVideoTrackSource,
   bool Init(size_t width,
             size_t height,
             size_t target_fps,
-            size_t capture_device_index);
+            size_t capture_device_index,
+            bool force_uyvy);
   void Destroy();
 
   // rtc::VideoSinkInterface interface.

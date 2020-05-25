@@ -27,7 +27,8 @@ DeviceVideoCapturer::~DeviceVideoCapturer() {
 bool DeviceVideoCapturer::Init(size_t width,
                                size_t height,
                                size_t target_fps,
-                               size_t capture_device_index) {
+                               size_t capture_device_index,
+    bool force_uyvy) {
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info(
       webrtc::VideoCaptureFactory::CreateDeviceInfo());
 
@@ -52,6 +53,11 @@ bool DeviceVideoCapturer::Init(size_t width,
   capability_.height = static_cast<int32_t>(height);
   capability_.maxFPS = static_cast<int32_t>(target_fps);
   capability_.videoType = webrtc::VideoType::kI420;
+  if(force_uyvy){
+    capability_.videoType = webrtc::VideoType::kUYVY;
+  }
+  
+
 
   if (vcm_->StartCapture(capability_) != 0) {
     Destroy();
@@ -74,7 +80,7 @@ DeviceVideoCapturer::Create(size_t width, size_t height, size_t target_fps) {
   }
   int num_devices = info->NumberOfDevices();
   for (int i = 0; i < num_devices; ++i) {
-    capturer = Create(width, height, target_fps, i);
+    capturer = Create(width, height, target_fps, i,false);
     if (capturer) {
       RTC_LOG(LS_WARNING) << "Get Capture";
       return capturer;
@@ -89,10 +95,11 @@ rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
     size_t width,
     size_t height,
     size_t target_fps,
-    size_t capture_device_index) {
+    size_t capture_device_index,
+    bool force_uyvy) {
   rtc::scoped_refptr<DeviceVideoCapturer> vcm_capturer(
       new rtc::RefCountedObject<DeviceVideoCapturer>());
-  if (!vcm_capturer->Init(width, height, target_fps, capture_device_index)) {
+  if (!vcm_capturer->Init(width, height, target_fps, capture_device_index,force_uyvy)) {
     RTC_LOG(LS_WARNING) << "Failed to create DeviceVideoCapturer(w = " << width
                         << ", h = " << height << ", fps = " << target_fps
                         << ")";
@@ -105,7 +112,8 @@ rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
     size_t width,
     size_t height,
     size_t target_fps,
-    const std::string& capture_device) {
+    const std::string& capture_device,
+    bool force_uyvy) {
   rtc::scoped_refptr<DeviceVideoCapturer> vcm_capturer(
       new rtc::RefCountedObject<DeviceVideoCapturer>());
 
@@ -123,7 +131,7 @@ rtc::scoped_refptr<DeviceVideoCapturer> DeviceVideoCapturer::Create(
   if (index < 0) {
     return nullptr;
   }
-  return Create(width, height, target_fps, static_cast<size_t>(index));
+  return Create(width, height, target_fps, static_cast<size_t>(index),force_uyvy);
 }
 
 void DeviceVideoCapturer::Destroy() {
