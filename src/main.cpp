@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 #endif
 #else
     return DeviceVideoCapturer::Create(size.width, size.height, cs.framerate,
-                                       cs.video_device);
+                                       cs.video_device,cs.force_uyvy);
 #endif
 #endif  // USE_ROS
   })();
